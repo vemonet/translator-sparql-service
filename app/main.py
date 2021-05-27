@@ -92,8 +92,8 @@ app = SparqlEndpoint(
         'https://w3id.org/um/translator/label': translator_label,
         'https://w3id.org/um/translator/pref_id': translator_pref_id,
     },
-    title="SPARQL endpoint for RDFLib graph", 
-    description="A SPARQL endpoint to serve machine learning models, or any other logic implemented in Python. \n[Source code](https://github.com/vemonet/rdflib-endpoint)",
+    title="SPARQL endpoint for Translator services", 
+    description="A SPARQL endpoint to serve Translator APIs. \n[Source code](https://github.com/vemonet/translator-sparql-service)",
     version="0.0.1",
     public_url='https://translator-service.137.120.31.102.nip.io/sparql',
     cors_enabled=True
