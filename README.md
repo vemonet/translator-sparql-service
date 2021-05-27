@@ -1,10 +1,57 @@
 # SPARQL endpoint for Translator services  
 
-A SPARQL endpoint to serve Translator API operations as SPARQL custom functions.
+A SPARQL endpoint to serve Translator API operations as SPARQL custom functions. Built with [rdflib-endpoint](https://github.com/vemonet/rdflib-endpoint)
 
-Translator API integrated:
+Access the SPARQL service endpoint at https://translator-service.137.120.31.102.nip.io/sparql
+
+OpenAPI docs at https://translator-service.137.120.31.102.nip.io
+
+Translator APIs integrated:
 
 * https://nodenormalization-sri.renci.org/docs
+
+## Example queries 📬
+
+### Get label  for entity
+
+From a CURIE, or URI following this pattern: https://identifiers.org/NAMESPACE:ID
+
+```SPARQL
+PREFIX umtranslator: <https://w3id.org/um/translator/>
+SELECT ?entity ?label WHERE {
+    BIND("MONDO:0005146" AS ?entity)
+    BIND(umtranslator:label(?entity) AS ?label)
+}
+```
+
+### Get preferred ID
+
+From a CURIE, or URI following this pattern: https://identifiers.org/NAMESPACE:ID
+
+```SPARQL
+PREFIX umtranslator: <https://w3id.org/um/translator/>
+SELECT ?entity ?pref_id WHERE {
+    BIND("MONDO:0005146" AS ?entity)
+    BIND(umtranslator:pref_id(?entity) AS ?pref_id)
+}
+```
+
+### Try a federated query
+
+Use this federated query to retrieve labels from any other SPARQL endpoint supporting federated queries.
+
+```SPARQL
+PREFIX umtranslator: <https://w3id.org/um/translator/>
+SELECT * WHERE
+{
+  SERVICE <https://translator-service.137.120.31.102.nip.io/sparql> {
+    SELECT ?entity ?label WHERE {
+        BIND("MONDO:0005146" AS ?entity)
+        BIND(umtranslator:label(?entity) AS ?label)
+    }
+  }
+}
+```
 
 ## Install and run ✨️
 
@@ -39,43 +86,3 @@ Run on http://localhost:8080
 ```bash
 docker run -p 8080:80 rdflib-endpoint
 ```
-
-## Example queries
-
-Get label  from CURIE:
-
-```SPARQL
-PREFIX umtranslator: <https://w3id.org/um/translator/>
-SELECT ?entity ?label WHERE {
-    BIND("MONDO:0005146" AS ?entity)
-    BIND(umtranslator:label(?entity) AS ?label)
-}
-```
-
-Get preferred ID (CURIE):
-
-```SPARQL
-PREFIX umtranslator: <https://w3id.org/um/translator/>
-SELECT ?entity ?pref_id WHERE {
-    BIND("MONDO:0005146" AS ?entity)
-    BIND(umtranslator:pref_id(?entity) AS ?pref_id)
-}
-```
-
-## Try a federated query 📬
-
-Use this federated query to retrieve predicted treatments for a drug or disease (OMIM or DRUGBANK) from any other SPARQL endpoint supporting federated queries (note that this query use our test SPARQL endpoints, it might not be always up)
-
-```SPARQL
-PREFIX umtranslator: <https://w3id.org/um/translator/>
-SELECT * WHERE
-{
-  SERVICE <https://translator-service.137.120.31.102.nip.io/sparql> {
-    SELECT ?entity ?label WHERE {
-        BIND("MONDO:0005146" AS ?entity)
-        BIND(umtranslator:label(?entity) AS ?label)
-    }
-  }
-}
-```
-

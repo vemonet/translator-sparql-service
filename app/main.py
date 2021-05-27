@@ -69,6 +69,7 @@ def translator_pref_id(query_results, ctx, part, eval_part):
 
     evaluation = []
     if argument1.startswith('https://identifiers.org/'):
+        # Quick hack to support identifiers URIs
         argument1 = argument1.replace('https://identifiers.org/', '')
 
     # Resolve CURIEs label using https://nodenormalization-sri.renci.org/docs
