@@ -1,8 +1,8 @@
 from rdflib_endpoint import SparqlEndpoint
 
-from rdflib import Graph, Literal, RDF, URIRef
 from rdflib.plugins.sparql.evalutils import _eval
 from rdflib import Graph, Literal, RDF, URIRef
+from rdflib.graph import ConjunctiveGraph
 # from rdflib.namespace import Namespace
 
 import requests
@@ -100,7 +100,7 @@ SELECT ?entity ?pref_id WHERE {
 ```"""
 
 # Start the SPARQL endpoint based on a RDFLib Graph
-g = Graph()
+g = ConjunctiveGraph()
 app = SparqlEndpoint(
     graph=g,
     functions={
