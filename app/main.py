@@ -15,7 +15,7 @@ def translator_label(query_results, ctx, part, eval_part):
     PREFIX umtranslator: <https://w3id.org/um/translator/>
     SELECT ?entity ?label WHERE {
         BIND("MONDO:0005146" AS ?entity)
-        BIND(umtranslator:label(?entity) AS ?label)
+        BIND(umtranslator:get_label(?entity) AS ?label)
     }
     \f
     :param query_results:   An array with the query results objects
@@ -87,7 +87,7 @@ example_query = """Resolve labels:\n
 PREFIX umtranslator: <https://w3id.org/um/translator/>
 SELECT ?entity ?label WHERE {
     BIND("MONDO:0005146" AS ?entity)
-    BIND(umtranslator:label(?entity) AS ?label)
+    BIND(umtranslator:get_label(?entity) AS ?label)
 }
 ```
 Resolve preferred ID:\n
@@ -107,7 +107,7 @@ g = ConjunctiveGraph(
 app = SparqlEndpoint(
     graph=g,
     functions={
-        'https://w3id.org/um/translator/label': translator_label,
+        'https://w3id.org/um/translator/get_label': translator_label,
         'https://w3id.org/um/translator/pref_id': translator_pref_id,
     },
     title="SPARQL endpoint for Translator services", 
