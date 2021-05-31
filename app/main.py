@@ -27,15 +27,19 @@ def translator_label(query_results, ctx, part, eval_part):
     argument1 = str(_eval(part.expr.expr[0], eval_part.forget(ctx, _except=part.expr._vars)))
     # argument2 = str(_eval(part.expr.expr[1], eval_part.forget(ctx, _except=part.expr._vars)))
     evaluation = []
-    identifiers = []
-    if argument1.startswith('https://identifiers.org/'):
-        argument1 = argument1.replace('https://identifiers.org/', '')
+    # identifiers = []
+    # if argument1.startswith('https://identifiers.org/'):
+    #     argument1 = argument1.replace('https://identifiers.org/', '')
+    argument1 = argument1.replace("https://identifiers.org/", "").replace("https://go.drugbank.com/drugs/", "DRUGBANK:").replace("http://purl.obolibrary.org/obo/HP_", "HP:").replace("http://purl.obolibrary.org/obo/MONDO_", "MONDO:")
 
     # Resolve CURIEs label using https://nodenormalization-sri.renci.org/docs
     resolve_curies = requests.get('https://nodenormalization-sri.renci.org/get_normalized_nodes',
         params={'curie': [argument1]}).json()
-    evaluation.append(resolve_curies[argument1]['id']['label'])
-    # identifiers.append(resolve_curies[argument1]['id']['identifier'])
+    try:
+        evaluation.append(resolve_curies[argument1]['id']['label'])
+        # identifiers.append(resolve_curies[argument1]['id']['identifier'])
+    except:
+        print('No results for ' + argument1)
 
     # Append the results for our custom function
     for i, result in enumerate(evaluation):
@@ -72,7 +76,10 @@ def translator_pref_id(query_results, ctx, part, eval_part):
     # Resolve CURIEs label using https://nodenormalization-sri.renci.org/docs
     resolve_curies = requests.get('https://nodenormalization-sri.renci.org/get_normalized_nodes',
         params={'curie': [argument1]}).json()
-    evaluation.append(resolve_curies[argument1]['id']['identifier'])
+    try:
+        evaluation.append(resolve_curies[argument1]['id']['identifier'])
+    except:
+        print('No results for ' + argument1)
 
     # Append the results for our custom function
     for i, result in enumerate(evaluation):

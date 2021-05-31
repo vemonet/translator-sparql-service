@@ -22,7 +22,7 @@ From a CURIE, or URI following this pattern: https://identifiers.org/NAMESPACE:I
 PREFIX umtranslator: <https://w3id.org/um/translator/>
 SELECT ?entity ?label WHERE {
     BIND("MONDO:0005146" AS ?entity)
-    BIND(umtranslator:label(?entity) AS ?label)
+    BIND(umtranslator:get_label(?entity) AS ?label)
 }
 ```
 
@@ -42,6 +42,8 @@ SELECT ?entity ?pref_id WHERE {
 
 Use this federated query to retrieve labels from any other SPARQL endpoint supporting federated queries.
 
+**From another SPARQL endpoint**
+
 ```SPARQL
 PREFIX umtranslator: <https://w3id.org/um/translator/>
 SELECT * WHERE
@@ -49,11 +51,63 @@ SELECT * WHERE
   SERVICE <https://service.translator.137.120.31.102.nip.io/sparql> {
     SELECT ?entity ?label WHERE {
         BIND("MONDO:0005146" AS ?entity)
-        BIND(umtranslator:label(?entity) AS ?label)
+        BIND(umtranslator:get_label(?entity) AS ?label)
     }
   }
 }
 ```
+
+**From the RDFLib SPARQL endpoint**
+
+⚠️ RDFLib has a few limitation related to federated queries:
+
+* Unfortunately, the `PREFIX` keyword does not work with federated queries in RDFLib, so we need to write the full URIs
+
+* The latest version of RDFLib (`5.0.0 `) only recognize **lowercase `service`**. This will be fixed in the next versions.
+
+Run this federated query on this RDFLib endpoint to resolve drug/disease labels retrieved from the Nanopublication network:
+
+```SPARQL
+SELECT DISTINCT ?label ?subject ?object (<https://w3id.org/um/translator/get_label>(str(?subject)) AS ?subjectLabel) (<https://w3id.org/um/translator/get_label>(str(?object)) AS ?objectLabel)
+WHERE {
+  	service <http://virtuoso.np.dumontierlab.137.120.31.101.nip.io/sparql> {
+        SELECT * WHERE {
+            GRAPH ?np_assertion {
+              ?association <http://www.w3.org/2000/01/rdf-schema#label> ?label ;
+                <http://www.w3.org/1999/02/22-rdf-syntax-ns#subject> ?subject ;
+                <http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate> ?predicate ;
+                <http://www.w3.org/1999/02/22-rdf-syntax-ns#object> ?object .
+              optional {
+                ?association <https://w3id.org/biolink/vocab/relation> ?relation .
+              }
+              optional {
+                ?association <https://w3id.org/biolink/vocab/provided_by> ?provided_by .
+              }
+              optional {
+                ?association <https://w3id.org/biolink/vocab/association_type> ?association_type .
+              }
+              ?subject <https://w3id.org/biolink/vocab/category> ?subject_category .
+              ?object <https://w3id.org/biolink/vocab/category> ?object_category .
+            }
+            filter ( ?subject_category = <https://w3id.org/biolink/vocab/Drug> || ?subject_category = <https://w3id.org/biolink/vocab/ChemicalSubstance> )
+            filter ( ?object_category = <https://w3id.org/biolink/vocab/Disease> )
+            GRAPH ?np_head {
+                ?np_uri <http://www.nanopub.org/nschema#hasAssertion> ?np_assertion .
+            }
+                ?np_uri <http://purl.org/dc/terms/creator> <https://orcid.org/0000-0002-7641-6446> .
+            	filter NOT EXISTS { ?creator <http://purl.org/nanopub/x/retracts> ?np_uri }
+        } LIMIT 5
+  	}
+}
+```
+
+> Note: Adding this filter make the federated query crash in RDFLib (works with Fuseki functions):
+>
+> ```SPARQL
+>             GRAPH <http://purl.org/nanopub/admin/graph> {
+>                 ?np_uri <http://purl.org/nanopub/admin/hasValidSignatureForPublicKey> ?pubkey .
+>             }
+> ```
 
 ## Install and run ✨️
 
