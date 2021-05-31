@@ -100,7 +100,10 @@ SELECT ?entity ?pref_id WHERE {
 ```"""
 
 # Start the SPARQL endpoint based on a RDFLib Graph
-g = ConjunctiveGraph()
+g = ConjunctiveGraph(
+    identifier=URIRef('https://w3id.org/um/translator/graph/default'), 
+)
+
 app = SparqlEndpoint(
     graph=g,
     functions={
