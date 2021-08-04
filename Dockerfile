@@ -7,6 +7,6 @@ RUN pip install -r /tmp/requirements.txt
 # cf. https://fastapi.tiangolo.com/deployment/docker/
 COPY ./app /app
 
+EXPOSE 80
 
-# EXPOSE 80
 # ENTRYPOINT ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]

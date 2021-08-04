@@ -142,3 +142,31 @@ Run on http://localhost:8080
 ```bash
 docker run -p 8080:80 rdflib-endpoint
 ```
+
+## Or deploy on the DSRI
+
+Build from the `Dockerfile` and deploy in a DSRI project with HTTPS enabled:
+
+```bash
+oc new-build --name translator-sparql --binary
+oc start-build translator-sparql --from-dir=. --follow --wait
+oc new-app translator-sparql
+oc patch deployment/translator-sparql --patch '{"spec":{"template": {"spec":{"serviceAccountName": "anyuid"}}}}'
+oc expose svc/translator-sparql
+oc patch route/translator-sparql --patch '{"spec":{"tls": {"termination": "edge", "insecureEdgeTerminationPolicy": "Redirect"}}}'
+```
+
+Get the routes exposed in your project:
+
+```bash
+oc get route
+```
+
+
+
+Delete:
+
+```bash
+oc delete build translator-sparql
+```
+
